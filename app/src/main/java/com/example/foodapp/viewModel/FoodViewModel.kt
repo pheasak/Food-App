@@ -6,12 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.foodapp.data.repository.FoodRepository
 import com.example.foodapp.ui.state.FoodUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class FoodViewModel: ViewModel() {
     private val repository = FoodRepository()
 
-    var uiState by mutableStateOf(FoodUiState())
-        private set
+    private val _uiState = MutableStateFlow(FoodUiState())
+
+    val uiState = _uiState.asStateFlow()
 
     init {
         // Initialize
@@ -19,15 +22,45 @@ class FoodViewModel: ViewModel() {
     }
 
     private fun loadFoods(){
-        uiState = uiState.copy(
-            foodList = repository.getFoods()
+
+        _uiState.value = _uiState.value.copy(
+            isLoading = true
+        )
+
+        _uiState.value  = _uiState.value .copy(
+            foodList = repository.getFoods(),
+            isLoading = false
         )
     }
 
     fun selectFood(id:Int){
-        uiState = uiState.copy(
+        _uiState.value  = _uiState.value .copy(
             selectedFood = repository.getFoodById(id)
         )
     }
+
+    fun toggleFavorite(foodId: Int){
+        val updatedFood = _uiState.value .foodList.map {
+            food ->
+                if(food.id == foodId){
+                    food.copy(
+                        isFavorite = !food.isFavorite
+                    )
+                }else{
+                    food
+                }
+        }
+
+        _uiState.value  = _uiState.value .copy(
+            foodList = updatedFood
+        )
+    }
+
+    fun updateSearchQuery(query:String){
+        _uiState.value  = _uiState.value .copy(
+            searchQuery = query
+        )
+    }
+
 
 }

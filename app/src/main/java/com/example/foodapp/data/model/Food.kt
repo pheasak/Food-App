@@ -7,4 +7,5 @@ data class Food(
     val price: Double,
     val category:String,
     val imageUrl: String,
+    val isFavorite: Boolean = false,
 )

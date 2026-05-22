@@ -14,12 +14,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,21 +47,44 @@ import com.example.foodapp.viewModel.FoodViewModel
 fun HomeScreen(
     viewModel: FoodViewModel,
     onClick: (Int) -> Unit,
+    onFavoriteButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ){
-    val foods = viewModel.uiState.foodList
-    LazyColumn(
+    val uiState by viewModel.uiState.collectAsState()
+    val foods = uiState.foodList.filter { it.name.contains(uiState.searchQuery,ignoreCase = true) }
+    Column(
         modifier = modifier
     ) {
-        items(items = foods){
-            food -> FoodCard(food, onClick = onClick)
+        OutlinedTextField(
+            value = uiState.searchQuery,
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp),
+            onValueChange = {
+                viewModel.updateSearchQuery(it)
+            },
 
+            label = {
+                Text(text = "Search Food")
+            }
+        )
+        if(uiState.isLoading){
+            CircularProgressIndicator()
+        }else{
+            LazyColumn(
+                modifier = modifier
+            ) {
+                items(items = foods) { food ->
+                    FoodCard(food, onClick = onClick, onFavoriteButtonClicked = onFavoriteButtonClicked)
+
+                }
+            }
         }
+
     }
 }
 
 @Composable
-fun FoodCard(food: Food,onClick: (Int)-> Unit){
+fun FoodCard(food: Food,onClick: (Int)-> Unit,
+             onFavoriteButtonClicked: (Int)-> Unit){
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondary
@@ -69,7 +103,7 @@ fun FoodCard(food: Food,onClick: (Int)-> Unit){
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .padding(start =10.dp, )
+                    .padding(start = 10.dp,)
                     .clip(RoundedCornerShape(8.dp))
             ) {
 
@@ -87,7 +121,24 @@ fun FoodCard(food: Food,onClick: (Int)-> Unit){
 
             ) {
 
-                Text(text = food.name)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = food.name)
+
+                    IconButton(
+                        onClick = {
+                            onFavoriteButtonClicked(food.id)
+                        },
+                        modifier = Modifier.size(20.dp)
+                    ) {
+                        Icon(
+                            imageVector = if(food.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = "favorite"
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -114,6 +165,7 @@ fun HomeScreenPreview(){
         viewModel = foodViewModel,
         onClick = {
 
-        }
+        },
+        onFavoriteButtonClicked = {}
     )
 }

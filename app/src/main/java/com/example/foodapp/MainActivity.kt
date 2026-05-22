@@ -82,10 +82,16 @@ fun FoodApp( modifier: Modifier = Modifier,navController: NavHostController = re
             composable(
                 route = FoodScreen.HOME.name
             ){
-                HomeScreen(viewModel, onClick = {
-                    viewModel.selectFood(it)
-                    navController.navigate(route = FoodScreen.DETAIL.name)
-                })
+                HomeScreen(
+                    viewModel,
+                    onClick = {
+                        viewModel.selectFood(it)
+                        navController.navigate(route = FoodScreen.DETAIL.name)
+                    },
+                    onFavoriteButtonClicked = {
+                        viewModel.toggleFavorite(it)
+                    }
+                )
             }
 
             composable(route = FoodScreen.DETAIL.name){
