@@ -54,6 +54,8 @@ class FoodViewModel: ViewModel() {
         _uiState.value  = _uiState.value .copy(
             foodList = updatedFood
         )
+
+        addFavoriteFood()
     }
 
     fun updateSearchQuery(query:String){
@@ -62,5 +64,10 @@ class FoodViewModel: ViewModel() {
         )
     }
 
-
+    fun addFavoriteFood(){
+        val foodsFilter = _uiState.value.foodList.filter { food -> food.isFavorite }
+        _uiState.value = _uiState.value.copy(
+            favoriteList = foodsFilter
+        )
+    }
 }

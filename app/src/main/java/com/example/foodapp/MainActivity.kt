@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.foodapp.ui.screen.DetailScreen
+import com.example.foodapp.ui.screen.FavoriteScreen
 import com.example.foodapp.ui.screen.HomeScreen
 import com.example.foodapp.ui.theme.FoodAppTheme
 import com.example.foodapp.viewModel.FoodViewModel
@@ -32,7 +34,8 @@ import com.example.foodapp.viewModel.FoodViewModel
 
 enum class FoodScreen( val title:String){
     HOME(title = "Home"),
-    DETAIL("Detail")
+    DETAIL("Detail"),
+    FAVORITE("Favorite")
 }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +74,18 @@ fun FoodApp( modifier: Modifier = Modifier,navController: NavHostController = re
                         )
                     }
                 }
+            },
+            actions = {
+                IconButton(
+                    onClick = {
+                        navController.navigate(route = FoodScreen.FAVORITE.name)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = "Back"
+                    )
+                }
             }
         )
     },) { innerPadding ->
@@ -97,6 +112,16 @@ fun FoodApp( modifier: Modifier = Modifier,navController: NavHostController = re
             composable(route = FoodScreen.DETAIL.name){
                 DetailScreen(
                     viewModel
+                )
+            }
+
+            composable(route= FoodScreen.FAVORITE.name){
+                FavoriteScreen(
+                    modifier = Modifier,
+                    viewModel,
+                    onClick = {
+                    navController.navigate(route = FoodScreen.DETAIL.name)
+                }
                 )
             }
         }
