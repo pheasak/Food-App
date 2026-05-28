@@ -126,7 +126,7 @@ fun FoodFavoriteCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = food.category)
+                    Text(text = food.categoryName)
 
                     Text(text = "$${food.price}")
                 }
